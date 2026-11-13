@@ -1,8 +1,20 @@
 # Haven
 
-**A Discord-based AI assistant I built to use on my Windows computer.**
+**A Discord assistant that can switch AI backends mid-conversation and ask before it acts.**
 
-I wanted one place to ask for help with everyday work, from checking my calendar to comparing contact lists. I built Haven so it could carry out those requests through Discord and show me what happened. It runs on my computer and uses Claude with Codex as a backup.
+I built Haven to do everyday work on my Windows computer from Discord. When Claude hits a usage limit, Codex can pick up the request and drive the same browser. When an action needs my approval, Haven shows me exactly what it plans to do.
+
+**[Download the interactive demo](https://github.com/Bluezip231/Haven-Public/releases/latest/download/haven-demo.zip)** · [Release notes](https://github.com/Bluezip231/Haven-Public/releases/latest)
+
+Unzip the download and open `haven-demo.html` in your browser. The three scenarios run offline with fictional data. They simulate Haven’s workflow and require no account, API key, or installation.
+
+![Haven Public demo showing the handoff from Claude to Codex](media/haven-demo.png)
+
+## Try it in a minute
+
+- **AI failover** replays a browser request that moves from Claude to Codex after a usage limit.
+- **Calendar approval** lets you approve or decline a simulated event and see the outcome.
+- **CRM matching** compares two fictional contacts with matching phone numbers and conflicting emails.
 
 ## What I built
 
@@ -14,15 +26,6 @@ I wanted one place to ask for help with everyday work, from checking my calendar
 | **CRM and automations** | A SQLite-backed dashboard manages contacts, reviews likely duplicates, and compares records from two lists. A scheduler runs jobs such as reconciliation and health reports. |
 | **Supervised updates** | Haven can prepare code changes in an isolated Git worktree and test them there. A separate supervisor starts the updated bot, checks that it connects to Discord, and can roll back a failed startup. |
 
-## Example: finding a duplicate contact
-
-| Fictional record | Company | Phone | Email |
-| --- | --- | --- | --- |
-| CRM | Cedar & Finch Studio | 304-555-0142 | hello@example.com |
-| Partner list | Cedar and Finch Studio LLC | 304-555-0142 | studio@example.com |
-
-Haven normalizes the company names and recognizes the shared phone number. It flags a likely match and puts the two email addresses side by side for review. I decide which details to keep.
-
 ## A bug I tracked down
 
 Codex used to say it couldn’t control the browser even though Haven had already registered the browser tools. Restarting Haven brought up a new bot process, but Codex resumed a thread with older instructions. The updated session handling starts a fresh AI session after a build or instruction change and carries over recent exchanges.
@@ -33,4 +36,6 @@ I verified the fix from Discord. Codex opened a test page, posted a screenshot, 
 
 Python, discord.py, Claude Agent SDK, Codex SDK, Playwright, SQLite, Starlette, Docker, and Git.
 
-This repository is a portfolio overview. The running assistant and its source live in a private repository.
+This repository contains the portfolio case study and offline demo. The full assistant and its source live in a private repository.
+
+If the demo gives you an idea for your own AI assistant, consider starring the repo.

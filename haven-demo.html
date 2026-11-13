@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Haven · Interactive demo</title>
+  <style>
+    :root { color-scheme: dark; font: 16px/1.55 "Inter", system-ui, sans-serif; color: #f3f5f5; background: #111717; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: radial-gradient(ellipse at top right, #203b35, transparent 62%); }
+    main { width: min(980px, calc(100% - 48px)); margin: auto; padding: 48px 0; }
+    header { margin-bottom: 30px; }
+    .identity { display: flex; align-items: center; gap: 10px; color: #a8f3d7; font-weight: 700; }
+    .mark { font-size: 15px; background: #a8f3d7; color: #102921; display: grid; place-items: center; width: 31px; height: 31px; border-radius: 8px; }
+    h1 { font-size: clamp(29px, 5vw, 50px); line-height: 1.08; margin: 17px 0 10px; letter-spacing: -.045em; }
+    h2 { font-size: 23px; margin: 0 0 7px; letter-spacing: -.02em; }
+    p { margin: 0; }
+    .muted, footer { color: #b4c2be; }
+    .layout { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 20px; align-items: start; }
+    nav { display: grid; gap: 8px; }
+    button { font: inherit; cursor: pointer; border: 1px solid #3a514b; border-radius: 9px; background: #202c29; color: #eef6f2; padding: 9px 14px; }
+    button:hover { background: #2d4039; }
+    button:focus-visible { outline: 3px solid #a8f3d7; outline-offset: 3px; }
+    nav button { text-align: left; }
+    nav button[aria-pressed="true"] { background: #28473d; color: #b8ffe4; border-color: #6cb59d; }
+    .panel { background: #171f1e; border: 1px solid #3a514b; border-radius: 14px; padding: clamp(18px, 4vw, 28px); }
+    .steps { margin: 21px 0; padding-left: 0; list-style: none; border-top: 1px solid #33433f; }
+    .steps li { display: grid; grid-template-columns: 106px minmax(0, 1fr); padding: 12px 0; gap: 12px; border-bottom: 1px solid #33433f; }
+    .steps strong { color: #a8f3d7; font-size: .9rem; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 0; align-items: center; }
+    .primary { background: #a8f3d7; color: #102921; border-color: #a8f3d7; font-weight: 700; }
+    .primary:hover { background: #ceffe9; }
+    .result { color: #c9f8e6; margin-top: 15px; }
+    .result:empty { margin: 0; }
+    footer { margin-top: 20px; font-size: .875rem; }
+    @media (max-width: 660px) {
+      main { width: calc(100% - 32px); padding: 28px 0; }
+      .layout { grid-template-columns: 1fr; gap: 12px; }
+      nav { display: flex; flex-wrap: wrap; }
+      nav button { font-size: .9rem; }
+      .steps li { grid-template-columns: 1fr; gap: 3px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="identity"><span class="mark" aria-hidden="true">H</span> Haven Public</div>
+      <h1>What happens after you ask?</h1>
+      <p class="muted">Walk through AI failover, an approval card, and a CRM match.</p>
+    </header>
+    <div class="layout">
+      <nav aria-label="Demo scenarios">
+        <button type="button" data-target="fallback" aria-pressed="true">AI failover</button>
+        <button type="button" data-target="approval" aria-pressed="false">Calendar approval</button>
+        <button type="button" data-target="contacts" aria-pressed="false">CRM matching</button>
+      </nav>
+      <section class="panel" id="fallback" aria-labelledby="fallback-title">
+        <h2 id="fallback-title">Claude hits a usage limit</h2>
+        <p class="muted">“Open Example Domain in Haven’s browser and tell me the title.”</p>
+        <ol class="steps">
+          <li><strong>Claude</strong><span>Usage limit reached before the browser opened.</span></li>
+          <li><strong>Haven router</strong><span>Checks that the request hasn’t changed anything and passes recent conversation context to Codex.</span></li>
+          <li><strong>Codex</strong><span>Uses the same browser tools to open the page and read its title.</span></li>
+        </ol>
+        <div class="actions"><button type="button" class="primary" data-result="Codex replied: The page title is Example Domain.">Run the replay</button></div>
+        <p class="result" role="status"></p>
+      </section>
+      <section class="panel" id="approval" aria-labelledby="approval-title" hidden>
+        <h2 id="approval-title">Review a calendar action</h2>
+        <p class="muted">A simulated approval card shows what would happen before Haven acts.</p>
+        <ul class="steps">
+          <li><strong>Action</strong><span>Create an event named Project check-in</span></li>
+          <li><strong>Time</strong><span>Tomorrow, 2:00–2:30 p.m.</span></li>
+          <li><strong>Guests</strong><span>None</span></li>
+        </ul>
+        <div class="actions">
+          <button type="button" class="primary" data-result="Approved. The simulated event would be created.">Approve demo</button>
+          <button type="button" data-result="Declined. The simulated event was cancelled.">Decline demo</button>
+        </div>
+        <p class="result" role="status"></p>
+      </section>
+      <section class="panel" id="contacts" aria-labelledby="contacts-title" hidden>
+        <h2 id="contacts-title">Compare two fictional contacts</h2>
+        <p class="muted">The matching rule weighs the shared phone number and normalized company name.</p>
+        <ul class="steps">
+          <li><strong>CRM record</strong><span>Cedar &amp; Finch Studio<br>304-555-0142 · hello@example.com</span></li>
+          <li><strong>Partner list</strong><span>Cedar and Finch Studio LLC<br>304-555-0142 · studio@example.com</span></li>
+        </ul>
+        <div class="actions"><button type="button" class="primary" data-result="Likely match. The phone numbers and normalized company names agree. The email addresses differ, so both records stay available for review.">Compare records</button></div>
+        <p class="result" role="status"></p>
+      </section>
+    </div>
+    <footer>Offline demo · Fictional records and simulated actions</footer>
+  </main>
+  <script>
+    const tabs = [...document.querySelectorAll("[data-target]")];
+    const panels = [...document.querySelectorAll(".panel")];
+
+    for (const tab of tabs) {
+      tab.addEventListener("click", () => {
+        for (const button of tabs) button.setAttribute("aria-pressed", String(button === tab));
+        for (const panel of panels) panel.hidden = panel.id !== tab.dataset.target;
+      });
+    }
+
+    for (const button of document.querySelectorAll("[data-result]")) {
+      button.addEventListener("click", () => {
+        button.closest("section").querySelector(".result").textContent = button.dataset.result;
+      });
+    }
+  </script>
+</body>
+</html>
