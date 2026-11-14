@@ -1,115 +1,506 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="color-scheme" content="dark">
-  <title>Haven · Interactive demo</title>
-  <style>
-    :root { color-scheme: dark; font: 16px/1.55 "Inter", system-ui, sans-serif; color: #f3f5f5; background: #111717; }
-    * { box-sizing: border-box; }
-    body { margin: 0; min-height: 100vh; background: radial-gradient(ellipse at top right, #203b35, transparent 62%); }
-    main { width: min(980px, calc(100% - 48px)); margin: auto; padding: 48px 0; }
-    header { margin-bottom: 30px; }
-    .identity { display: flex; align-items: center; gap: 10px; color: #a8f3d7; font-weight: 700; }
-    .mark { font-size: 15px; background: #a8f3d7; color: #102921; display: grid; place-items: center; width: 31px; height: 31px; border-radius: 8px; }
-    h1 { font-size: clamp(29px, 5vw, 50px); line-height: 1.08; margin: 17px 0 10px; letter-spacing: -.045em; }
-    h2 { font-size: 23px; margin: 0 0 7px; letter-spacing: -.02em; }
-    p { margin: 0; }
-    .muted, footer { color: #b4c2be; }
-    .layout { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 20px; align-items: start; }
-    nav { display: grid; gap: 8px; }
-    button { font: inherit; cursor: pointer; border: 1px solid #3a514b; border-radius: 9px; background: #202c29; color: #eef6f2; padding: 9px 14px; }
-    button:hover { background: #2d4039; }
-    button:focus-visible { outline: 3px solid #a8f3d7; outline-offset: 3px; }
-    nav button { text-align: left; }
-    nav button[aria-pressed="true"] { background: #28473d; color: #b8ffe4; border-color: #6cb59d; }
-    .panel { background: #171f1e; border: 1px solid #3a514b; border-radius: 14px; padding: clamp(18px, 4vw, 28px); }
-    .steps { margin: 21px 0; padding-left: 0; list-style: none; border-top: 1px solid #33433f; }
-    .steps li { display: grid; grid-template-columns: 106px minmax(0, 1fr); padding: 12px 0; gap: 12px; border-bottom: 1px solid #33433f; }
-    .steps strong { color: #a8f3d7; font-size: .9rem; }
-    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 0; align-items: center; }
-    .primary { background: #a8f3d7; color: #102921; border-color: #a8f3d7; font-weight: 700; }
-    .primary:hover { background: #ceffe9; }
-    .result { color: #c9f8e6; margin-top: 15px; }
-    .result:empty { margin: 0; }
-    footer { margin-top: 20px; font-size: .875rem; }
-    @media (max-width: 660px) {
-      main { width: calc(100% - 32px); padding: 28px 0; }
-      .layout { grid-template-columns: 1fr; gap: 12px; }
-      nav { display: flex; flex-wrap: wrap; }
-      nav button { font-size: .9rem; }
-      .steps li { grid-template-columns: 1fr; gap: 3px; }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="Try Haven's AI failover, calendar approvals, CRM matching, and supervised updates with fictional data.">
+<title>Haven · Interactive Demo</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #10141b; --surface: #161c25; --raised: #1b222d; --line: #2a3442;
+  --muted: #a2adbd; --text: #eff2f7; --mint: #a5f2cf; --violet: #c3b4ff; --amber: #ffcc8a;
+  font: 15px/1.55 "Inter", system-ui, sans-serif; color: var(--text); background: var(--bg);
+}
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; }
+a { color: inherit; text-decoration-color: #5c6e81; text-underline-offset: 4px; }
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+button:disabled { opacity: .55; cursor: default; }
+button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid var(--mint); outline-offset: 3px; }
+h1, h2, h3, p, ol, ul { margin: 0; }
+.shell { max-width: 1320px; margin: auto; padding: 0 36px; }
+.top { border-bottom: 1px solid var(--line); background: #121820; }
+.top .shell { min-height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.brand { display: flex; align-items: center; gap: 11px; font-size: 16px; font-weight: 720; }
+.mark { display: grid; place-items: center; width: 32px; height: 32px; color: #10241b; background: var(--mint); border-radius: 9px; font-size: 17px; }
+.bar-links { display: flex; align-items: center; gap: 21px; color: var(--muted); font-size: 13px; }
+.bar-links a:hover, footer a:hover { color: var(--mint); }
+.intro { padding: 40px 0 25px; }
+h1 { font-size: clamp(33px, 5vw, 52px); line-height: 1.1; letter-spacing: -.055em; margin: 0 0 12px; }
+.intro p { color: var(--muted); font-size: 16px; max-width: 640px; }
+.workspace { display: grid; grid-template-columns: 205px minmax(0, 1fr) 264px; min-height: 554px; border: 1px solid var(--line); border-radius: 15px; overflow: hidden; background: var(--surface); }
+.sidebar { padding: 20px 12px; background: #131923; border-right: 1px solid var(--line); }
+.label { color: var(--muted); font-size: 11px; letter-spacing: .09em; text-transform: uppercase; font-weight: 700; }
+.sidebar .label { margin: 0 8px 11px; }
+.scenarios { display: grid; gap: 7px; }
+.scenario { padding: 11px 9px; display: flex; gap: 10px; align-items: center; text-align: left; border: 1px solid transparent; border-radius: 9px; background: transparent; color: #c5cedb; width: 100%; }
+.scenario:hover { background: var(--raised); }
+.scenario[aria-pressed="true"] { background: #21322e; border-color: #344d43; color: #e6faee; }
+.glyph { width: 30px; height: 30px; flex: 0 0 30px; display: grid; place-items: center; border-radius: 7px; background: #293745; color: #dce7ff; font-weight: 700; }
+.scenario[aria-pressed="true"] .glyph { background: #335347; color: var(--mint); }
+.scenario strong, .scenario small { display: block; }
+.scenario strong { font-size: 13px; }
+.scenario small { color: var(--muted); font-size: 11px; }
+.conversation { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; min-width: 0; }
+.conversation-head { min-height: 62px; border-bottom: 1px solid var(--line); padding: 13px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.conversation-head h2 { font-size: 15px; }
+.conversation-head p { font-size: 12px; color: var(--muted); }
+.quiet, .secondary, .primary { border: 1px solid var(--line); border-radius: 8px; padding: 7px 11px; font-size: 13px; background: var(--raised); color: var(--text); white-space: nowrap; }
+.quiet { background: transparent; color: var(--muted); }
+.quiet:hover, .secondary:hover { background: #273341; color: var(--text); }
+.primary { background: var(--mint); color: #10241b; border-color: var(--mint); font-weight: 750; }
+.primary:hover { background: #cdf9e4; }
+.feed { padding: 19px 20px 16px; min-height: 347px; max-height: 550px; overflow-y: auto; overflow-wrap: anywhere; }
+.message { display: grid; grid-template-columns: 30px minmax(0,1fr); gap: 10px; margin-bottom: 15px; }
+.avatar { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; color: var(--mint); background: #284238; font-weight: 780; font-size: 12px; }
+.message.you .avatar { background: #34364d; color: #d8daff; }
+.byline { color: var(--muted); font-size: 12px; margin-bottom: 3px; }
+.byline strong { color: var(--text); font-size: 13px; margin-right: 5px; }
+.prompt { margin: 12px 0 0 40px; border: 1px solid var(--line); border-radius: 10px; background: #19212c; padding: 14px; }
+.prompt h3, .card h3 { font-size: 13px; margin-bottom: 5px; }
+.prompt p, .card p { color: #b9c6d5; font-size: 13px; }
+.card { margin: 10px 0 13px 40px; padding: 13px 14px; background: #19212b; border: 1px solid #344352; border-radius: 10px; }
+.card.approval { border-color: #695339; }
+.card.approval h3 { color: var(--amber); }
+.card.approval .primary { background: var(--amber); border-color: var(--amber); color: #281e11; }
+.card.approval .primary:hover { background: #ffe0b6; }
+.card.result { border-color: #3b5b4f; }
+.card.result h3 { color: var(--mint); }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.details { margin: 8px 0 0; font-size: 13px; color: #d4dee9; }
+.details div { display: grid; grid-template-columns: 72px minmax(0,1fr); gap: 9px; padding: 5px 0; border-bottom: 1px solid #283747; }
+.details dt { color: var(--muted); }
+.details dd { margin: 0; }
+.composer { padding: 13px 20px 16px; border-top: 1px solid var(--line); }
+.input-wrap { display: flex; gap: 8px; }
+.input-wrap input { width: 100%; min-width: 0; padding: 9px 11px; background: #111720; color: var(--text); border: 1px solid #354557; border-radius: 8px; font-size: 13px; }
+.input-wrap input::placeholder { color: #8292a6; }
+.composer .hint { color: var(--muted); margin-top: 7px; font-size: 11px; }
+.sample-header { color: var(--muted); font-size: 11px; }
+.inspector { border-left: 1px solid var(--line); padding: 21px 16px; background: #141b25; min-width: 0; }
+.inspector h2 { font-size: 14px; margin-bottom: 2px; }
+.inspector .hint { color: var(--muted); font-size: 12px; margin-bottom: 14px; }
+.trace { list-style: none; padding: 0; margin-bottom: 16px; }
+.trace li { padding: 0 0 12px 18px; position: relative; margin-left: 4px; border-left: 1px solid #344454; overflow-wrap: anywhere; }
+.trace li:last-child { border-left-color: transparent; padding-bottom: 0; }
+.trace li::before { content: ""; position: absolute; width: 8px; height: 8px; border-radius: 50%; background: #63768a; top: 5px; left: -4px; }
+.trace .ok::before { background: var(--mint); }
+.trace .warn::before { background: var(--amber); }
+.trace .active::before { background: var(--violet); }
+.trace strong, .trace small { display: block; }
+.trace strong { font-size: 12px; }
+.trace small { color: var(--muted); font-size: 11px; }
+.state { border-top: 1px solid var(--line); padding-top: 15px; }
+.state .label { margin-bottom: 8px; }
+.state p { font-size: 12px; color: #ccd7e4; overflow-wrap: anywhere; }
+.setting { display: flex; align-items: flex-start; gap: 8px; margin-top: 12px; font-size: 12px; color: #c7d2df; }
+.setting input { accent-color: var(--mint); margin: 4px 0 0; }
+footer { display: flex; gap: 10px 21px; justify-content: space-between; flex-wrap: wrap; padding: 16px 0 28px; color: var(--muted); font-size: 12px; }
+@media (max-width: 1050px) { .shell { padding: 0 24px; } .workspace { grid-template-columns: 168px minmax(0,1fr) 226px; } .scenario small { display: none; } }
+@media (max-width: 800px) {
+  .workspace { grid-template-columns: minmax(0,1fr) 226px; }
+  .sidebar { grid-column: 1 / -1; border-right: none; border-bottom: 1px solid var(--line); padding: 9px; }
+  .sidebar .label { display: none; }
+  .scenarios { display: flex; flex-wrap: wrap; gap: 4px; }
+  .scenario { width: auto; padding: 5px 8px; }
+  .glyph { width: 24px; height: 24px; flex-basis: 24px; }
+}
+@media (max-width: 600px) {
+  .shell { padding: 0 14px; }
+  .intro { padding: 26px 0 17px; }
+  .intro p { font-size: 14px; }
+  .workspace { grid-template-columns: 1fr; }
+  .scenario { gap: 4px; padding: 5px; }
+  .scenario strong { font-size: 11px; }
+  .scenario .glyph { font-size: 11px; width: 18px; height: 18px; flex-basis: 18px; }
+  .inspector { border-left: 0; border-top: 1px solid var(--line); }
+  .feed { min-height: 290px; max-height: 450px; padding: 13px; }
+  .conversation-head, .composer { padding: 11px 13px; }
+  .prompt, .card { margin-left: 0; }
+}
+</style>
 </head>
 <body>
-  <main>
-    <header>
-      <div class="identity"><span class="mark" aria-hidden="true">H</span> Haven Public</div>
-      <h1>What happens after you ask?</h1>
-      <p class="muted">Walk through AI failover, an approval card, and a CRM match.</p>
-    </header>
-    <div class="layout">
-      <nav aria-label="Demo scenarios">
-        <button type="button" data-target="fallback" aria-pressed="true">AI failover</button>
-        <button type="button" data-target="approval" aria-pressed="false">Calendar approval</button>
-        <button type="button" data-target="contacts" aria-pressed="false">CRM matching</button>
+<header class="top"><div class="shell">
+  <div class="brand"><span class="mark" aria-hidden="true">H</span> Haven Public</div>
+  <div class="bar-links"><a href="https://github.com/Bluezip231/Haven-Public">GitHub</a></div>
+</div></header>
+<main class="shell">
+  <div class="intro">
+    <h1>Try Haven.</h1>
+    <p>Watch Haven hand off a request, wait for your approval, or roll back a failed update. Follow each step as it happens.</p>
+  </div>
+  <div class="workspace">
+    <aside class="sidebar" aria-label="Demo scenarios">
+      <p class="label">Scenarios</p>
+      <nav class="scenarios" aria-label="Choose a scenario">
+        <button type="button" class="scenario" data-scenario="browser" aria-pressed="true"><span class="glyph" aria-hidden="true">⇄</span><span><strong>Browser failover</strong><small>Claude to Codex</small></span></button>
+        <button type="button" class="scenario" data-scenario="calendar" aria-pressed="false"><span class="glyph" aria-hidden="true">✓</span><span><strong>Calendar approval</strong><small>Review before acting</small></span></button>
+        <button type="button" class="scenario" data-scenario="crm" aria-pressed="false"><span class="glyph" aria-hidden="true">≋</span><span><strong>CRM matching</strong><small>Review a conflict</small></span></button>
+        <button type="button" class="scenario" data-scenario="update" aria-pressed="false"><span class="glyph" aria-hidden="true">↺</span><span><strong>Update rollback</strong><small>Test a supervisor recovery</small></span></button>
       </nav>
-      <section class="panel" id="fallback" aria-labelledby="fallback-title">
-        <h2 id="fallback-title">Claude hits a usage limit</h2>
-        <p class="muted">“Open Example Domain in Haven’s browser and tell me the title.”</p>
-        <ol class="steps">
-          <li><strong>Claude</strong><span>Usage limit reached before the browser opened.</span></li>
-          <li><strong>Haven router</strong><span>Checks that the request hasn’t changed anything and passes recent conversation context to Codex.</span></li>
-          <li><strong>Codex</strong><span>Uses the same browser tools to open the page and read its title.</span></li>
-        </ol>
-        <div class="actions"><button type="button" class="primary" data-result="Codex replied: The page title is Example Domain.">Run the replay</button></div>
-        <p class="result" role="status"></p>
-      </section>
-      <section class="panel" id="approval" aria-labelledby="approval-title" hidden>
-        <h2 id="approval-title">Review a calendar action</h2>
-        <p class="muted">A simulated approval card shows what would happen before Haven acts.</p>
-        <ul class="steps">
-          <li><strong>Action</strong><span>Create an event named Project check-in</span></li>
-          <li><strong>Time</strong><span>Tomorrow, 2:00–2:30 p.m.</span></li>
-          <li><strong>Guests</strong><span>None</span></li>
-        </ul>
-        <div class="actions">
-          <button type="button" class="primary" data-result="Approved. The simulated event would be created.">Approve demo</button>
-          <button type="button" data-result="Declined. The simulated event was cancelled.">Decline demo</button>
+    </aside>
+    <section class="conversation" aria-labelledby="scenario-name">
+      <header class="conversation-head"><div><h2 id="scenario-name">Browser failover</h2><p id="scenario-subtitle">Shared browser · Auto mode</p></div><button class="quiet" type="button" id="reset">Reset</button></header>
+      <div class="feed" id="feed" role="log" aria-label="Demo conversation"></div>
+      <form class="composer" id="composer">
+        <div class="input-wrap">
+          <input id="request" aria-label="Sample request" aria-describedby="hint" maxlength="120" autocomplete="off" required>
+          <button class="primary" id="send" type="submit">Send request</button>
         </div>
-        <p class="result" role="status"></p>
-      </section>
-      <section class="panel" id="contacts" aria-labelledby="contacts-title" hidden>
-        <h2 id="contacts-title">Compare two fictional contacts</h2>
-        <p class="muted">The matching rule weighs the shared phone number and normalized company name.</p>
-        <ul class="steps">
-          <li><strong>CRM record</strong><span>Cedar &amp; Finch Studio<br>304-555-0142 · hello@example.com</span></li>
-          <li><strong>Partner list</strong><span>Cedar and Finch Studio LLC<br>304-555-0142 · studio@example.com</span></li>
-        </ul>
-        <div class="actions"><button type="button" class="primary" data-result="Likely match. The phone numbers and normalized company names agree. The email addresses differ, so both records stay available for review.">Compare records</button></div>
-        <p class="result" role="status"></p>
-      </section>
-    </div>
-    <footer>Offline demo · Fictional records and simulated actions</footer>
-  </main>
-  <script>
-    const tabs = [...document.querySelectorAll("[data-target]")];
-    const panels = [...document.querySelectorAll(".panel")];
+        <p class="hint" id="hint"></p>
+      </form>
+    </section>
+    <aside class="inspector" aria-labelledby="activity-heading">
+      <h2 id="activity-heading">Activity trace</h2>
+      <p class="hint">See what Haven does with your request.</p>
+      <ol class="trace" id="trace" aria-label="Tool activity"></ol>
+      <div class="state" id="state"></div>
+    </aside>
+  </div>
+  <footer>
+    <span>Offline simulation with fictional data. Actions stay inside this page.</span>
+    <a href="https://github.com/Bluezip231/Haven-Public/releases/latest/download/haven-demo.zip">Download the demo</a>
+  </footer>
+  <noscript>This demo needs JavaScript to run the simulated requests.</noscript>
+</main>
+<script>
+"use strict";
 
-    for (const tab of tabs) {
-      tab.addEventListener("click", () => {
-        for (const button of tabs) button.setAttribute("aria-pressed", String(button === tab));
-        for (const panel of panels) panel.hidden = panel.id !== tab.dataset.target;
-      });
-    }
+const records = [
+  { name: "Cedar & Finch Studio", phone: "304-555-0142", email: "hello@example.com" },
+  { name: "Cedar and Finch Studio LLC", phone: "(304) 555-0142", email: "studio@example.com" }
+];
+const scenarios = {
+  browser: {
+    name: "Browser failover", subtitle: "Shared browser · Auto mode",
+    setup: "Open a public page and see which AI handles the request. You can toggle Claude’s simulated usage limit in the Activity panel.",
+    prompt: "Open Example Domain in Haven’s browser.", hint: "Try the sample request, or type “open example.com”.",
+    card: "Example Domain", cardNote: "A public test page used to demonstrate browser control."
+  },
+  calendar: {
+    name: "Calendar approval", subtitle: "Google Calendar · Simulated",
+    setup: "Ask Haven to put a project check-in on the calendar. You’ll get the exact event details and make the final call.",
+    prompt: "Schedule Project check-in", hint: "Type “Schedule” followed by any event title. The time is fixed for this demo.",
+    card: "Tomorrow · 2:00–2:30 p.m.", cardNote: "The sample calendar has no appointments at this time."
+  },
+  crm: {
+    name: "CRM matching", subtitle: "Two contact lists · Fictional records",
+    setup: "Compare two contact records. Haven can spot the likely match and surface conflicting details so you can decide which email to keep.",
+    prompt: "Compare the two Cedar & Finch contacts.", hint: "Send the sample request or type “compare contacts”.",
+    card: "Cedar & Finch Studio", cardNote: "Two lists contain a version of this company."
+  },
+  update: {
+    name: "Update rollback", subtitle: "Supervisor · Simulated",
+    setup: "Try a sample update. Pick what happens when the new build starts and see which version the supervisor keeps running.",
+    prompt: "Test a Haven update", hint: "Send the sample request or type “test an update”.",
+    card: "Sample build", cardNote: "Tests pass in an isolated Git worktree. The live startup check comes next."
+  }
+};
 
-    for (const button of document.querySelectorAll("[data-result]")) {
-      button.addEventListener("click", () => {
-        button.closest("section").querySelector(".result").textContent = button.dataset.result;
-      });
+const feed = document.getElementById("feed");
+const trace = document.getElementById("trace");
+const statePanel = document.getElementById("state");
+const request = document.getElementById("request");
+const send = document.getElementById("send");
+const scenarioButtons = [...document.querySelectorAll("[data-scenario]")];
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+let active = "browser";
+let sequence = 0;
+let inProgress = false;
+let limitClaude = true;
+let decisionPending = false;
+
+function newState() {
+  return { event: null, email: records[0].email, tab: null, version: 1 };
+}
+let sample = newState();
+
+function element(tag, text, className) {
+  const node = document.createElement(tag);
+  if (text) node.textContent = text;
+  if (className) node.className = className;
+  return node;
+}
+
+function scrollFeed() {
+  feed.scrollTop = feed.scrollHeight;
+}
+
+function message(author, body, description = "") {
+  const entry = element("article", "", author === "You" ? "message you" : "message");
+  const avatar = element("span", author === "You" ? "Y" : "H", "avatar");
+  avatar.setAttribute("aria-hidden", "true");
+  const content = element("div");
+  const byline = element("div", "", "byline");
+  byline.append(element("strong", author), description);
+  content.append(byline, element("p", body));
+  entry.append(avatar, content);
+  feed.append(entry);
+  scrollFeed();
+}
+
+function card(title, body, className = "") {
+  const box = element("section", "", "card " + className);
+  box.append(element("h3", title));
+  if (body) box.append(element("p", body));
+  feed.append(box);
+  return box;
+}
+
+function details(box, entries) {
+  const list = element("dl", "", "details");
+  for (const [label, value] of entries) {
+    const row = element("div");
+    row.append(element("dt", label), element("dd", value));
+    list.append(row);
+  }
+  box.append(list);
+}
+
+function decision(box, choices, apply) {
+  const actions = element("div", "", "actions");
+  const run = sequence;
+  for (const [index, [label, value]] of choices.entries()) {
+    const button = element("button", label, index === 0 ? "primary" : "secondary");
+    button.type = "button";
+    button.addEventListener("click", () => {
+      if (run !== sequence) return;
+      actions.remove();
+      decisionPending = false;
+      apply(value);
+      redrawState();
+      setBusy(false);
+      scrollFeed();
+      send.focus({ preventScroll: true });
+    }, { once: true });
+    actions.append(button);
+  }
+  box.append(actions);
+  decisionPending = true;
+  scrollFeed();
+  actions.firstElementChild.focus({ preventScroll: true });
+}
+
+function step(title, detail, color = "ok") {
+  const row = element("li", "", color);
+  row.append(element("strong", title), element("small", detail));
+  trace.append(row);
+}
+
+function redrawState() {
+  const focusedSetting = document.activeElement?.id === "claude-limit";
+  statePanel.replaceChildren(element("div", "Sample state", "label"));
+  if (active === "browser") {
+    statePanel.append(element("p", sample.tab ? "Open tab: " + sample.tab : "Open test tabs: none"));
+    const label = element("label", "", "setting");
+    const toggle = element("input");
+    toggle.type = "checkbox";
+    toggle.id = "claude-limit";
+    toggle.checked = limitClaude;
+    toggle.disabled = inProgress;
+    toggle.addEventListener("change", () => { limitClaude = toggle.checked; });
+    label.append(toggle, "Simulate Claude usage limit");
+    statePanel.append(label);
+    if (focusedSetting && !toggle.disabled) toggle.focus();
+  } else if (active === "calendar") {
+    statePanel.append(element("p", sample.event ? sample.event + " · 2:00–2:30 p.m." : "Tomorrow · No demo events"));
+  } else if (active === "crm") {
+    statePanel.append(element("p", "CRM email: " + sample.email));
+  } else {
+    statePanel.append(element("p", "Running version: " + sample.version + " · Online"));
+  }
+}
+
+function setBusy(busy) {
+  inProgress = busy;
+  send.disabled = busy || decisionPending;
+  request.disabled = busy || decisionPending;
+  send.textContent = decisionPending ? "Review pending" : busy ? "Running…" : "Send request";
+  redrawState();
+}
+
+function openScenario(key) {
+  active = key;
+  sequence += 1;
+  decisionPending = false;
+  const spec = scenarios[key];
+  for (const button of scenarioButtons) button.setAttribute("aria-pressed", String(button.dataset.scenario === key));
+  document.getElementById("scenario-name").textContent = spec.name;
+  document.getElementById("scenario-subtitle").textContent = spec.subtitle;
+  document.getElementById("hint").textContent = spec.hint;
+  feed.replaceChildren();
+  trace.replaceChildren();
+  message("Haven", spec.setup, "Demo guide");
+  const preview = element("section", "", "prompt");
+  preview.append(element("div", "Sample context", "sample-header"), element("h3", spec.card), element("p", spec.cardNote));
+  feed.append(preview);
+  step("Ready for a request", "Start with the sample below.", "active");
+  request.value = spec.prompt;
+  setBusy(false);
+  feed.scrollTop = 0;
+}
+
+function pause(run) {
+  return new Promise(resolve => setTimeout(() => resolve(run === sequence), reducedMotion.matches ? 0 : 340));
+}
+
+async function browserRun(run) {
+  const driver = limitClaude ? "Codex" : "Claude";
+  step("Claude · primary", limitClaude ? "Usage limit reached before tools ran." : "Available for this request.", limitClaude ? "warn" : "ok");
+  if (!await pause(run)) return;
+  if (limitClaude) {
+    step("Haven → Codex", "No action to replay. Recent context handed off.", "active");
+    if (!await pause(run)) return;
+  }
+  step("browser.open", driver + (sample.tab ? " returned to the existing example.com tab." : " opened example.com in a new tab."));
+  if (!await pause(run)) return;
+  sample.tab = "Example Domain";
+  step("browser.read", "Read the title from the shared browser.");
+  message("Haven", "I opened Example Domain in Haven’s browser. The page title is “Example Domain”.", driver);
+  const preview = card("Example Domain", "example.com · Open in the simulated browser", "result");
+  const close = element("button", "Close test tab", "secondary");
+  close.type = "button";
+  close.addEventListener("click", () => {
+    sample.tab = null;
+    close.remove();
+    preview.querySelector("p").textContent = "example.com · Test tab closed";
+    step("browser.tab.close", "Closed only the Example Domain tab.");
+    redrawState();
+    send.focus({ preventScroll: true });
+  }, { once: true });
+  const actions = element("div", "", "actions");
+  actions.append(close);
+  preview.append(actions);
+  scrollFeed();
+}
+
+async function calendarRun(run, title) {
+  step("calendar.availability", "Checked the fictional 2:00–2:30 p.m. window.");
+  if (!await pause(run)) return;
+  if (sample.event) {
+    step("calendar.conflict", "The previous demo event already occupies that slot.", "warn");
+    message("Haven", "“" + sample.event + "” is already in that slot. Remove the demo event to try again.");
+    const clear = element("button", "Remove demo event", "secondary");
+    clear.type = "button";
+    clear.addEventListener("click", () => {
+      sample.event = null;
+      clear.remove();
+      step("calendar.demo.reset", "Cleared the fictional event.");
+      redrawState();
+    }, { once: true });
+    const box = card("Time conflict", "Tomorrow · 2:00–2:30 p.m.");
+    const actions = element("div", "", "actions");
+    actions.append(clear);
+    box.append(actions);
+    return;
+  }
+  step("Approval required", "Waiting for your decision.", "warn");
+  const approval = card("Approve this calendar action?", "Haven will use these details if you approve.", "approval");
+  details(approval, [["Event", title], ["Time", "Tomorrow, 2:00–2:30 p.m."], ["Guests", "None"]]);
+  decision(approval, [["Approve event", true], ["Decline", false]], approved => {
+    if (approved) sample.event = title;
+    step(approved ? "calendar.create" : "Decision recorded", approved ? "Added to the sample calendar." : "Declined. The create action was skipped.", approved ? "ok" : "warn");
+    message("Haven", approved ? "“" + title + "” is now on the sample calendar." : "Declined. The sample calendar is still empty.");
+  });
+}
+
+function matchRecords(left, right) {
+  const company = name => name.toLowerCase().replace(/&/g, " and ").replace(/\b(llc|inc)\b/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+  const digits = phone => phone.replace(/\D/g, "");
+  return {
+    sameCompany: company(left.name) === company(right.name),
+    samePhone: digits(left.phone) === digits(right.phone),
+    emailConflict: left.email !== right.email
+  };
+}
+
+async function crmRun(run) {
+  const [primary, partner] = [{ ...records[0], email: sample.email }, records[1]];
+  const match = matchRecords(primary, partner);
+  step("crm.compare", "Normalized organization names and phone numbers.");
+  if (!await pause(run)) return;
+  if (!match.sameCompany || !match.samePhone || !match.emailConflict) {
+    step("crm.review", "Both sample records now agree.");
+    message("Haven", "The company, phone, and email agree. There’s no conflict to review.");
+    return;
+  }
+  step("Likely match", "Same company and phone. Conflicting emails.", "warn");
+  const report = card("Review the email conflict", "Both records point to Cedar & Finch Studio.", "approval");
+  details(report, [["CRM", primary.email], ["Partner", partner.email], ["Phone", primary.phone]]);
+  decision(report, [["Use partner email", partner.email], ["Keep current", primary.email]], email => {
+    sample.email = email;
+    step("crm.review", email === partner.email ? "Updated the sample CRM record." : "Kept the existing sample CRM record.");
+    message("Haven", "The CRM record uses " + sample.email + ".");
+  });
+}
+
+async function updateRun(run) {
+  const current = sample.version;
+  const candidate = current + 1;
+  step("worktree.test", "The sample tests passed in an isolated worktree.");
+  if (!await pause(run)) return;
+  step("supervisor.start", "Started candidate version " + candidate + ".", "active");
+  if (!await pause(run)) return;
+  step("supervisor.health", "Waiting for the candidate to report that it connected to Discord.", "warn");
+  const check = card("Does the candidate come online?", "Choose what happens during the simulated startup check.", "approval");
+  decision(check, [["Connects to Discord", true], ["Startup times out", false]], healthy => {
+    if (healthy) {
+      sample.version = candidate;
+      step("supervisor.accept", "Version " + candidate + " connected and stays running.");
+      message("Haven", "Version " + candidate + " is online. The supervisor recorded a successful startup.");
+    } else {
+      step("supervisor.rollback", "The health check timed out. Restored version " + current + ".", "warn");
+      step("supervisor.health", "Version " + current + " reconnected to Discord.");
+      message("Haven", "The update timed out during startup. Version " + current + " is back online.");
     }
-  </script>
+  });
+}
+
+document.getElementById("composer").addEventListener("submit", async event => {
+  event.preventDefault();
+  if (inProgress || decisionPending) return;
+  const text = request.value.trim();
+  const title = text.match(/^schedule\s+(.+)$/i)?.[1];
+  const supported = {
+    browser: /\bopen\b.*\bexample(?:\.com| domain)\b/i.test(text),
+    calendar: Boolean(title),
+    crm: /^compare\b/i.test(text),
+    update: /^test\b.*\bupdate\b/i.test(text)
+  };
+  if (!supported[active]) {
+    message("Haven", scenarios[active].hint, "Try another request");
+    return;
+  }
+  const run = ++sequence;
+  feed.replaceChildren();
+  trace.replaceChildren();
+  message("You", text);
+  setBusy(true);
+  if (active === "browser") await browserRun(run);
+  else if (active === "calendar") await calendarRun(run, title);
+  else if (active === "crm") await crmRun(run);
+  else await updateRun(run);
+  if (run !== sequence) return;
+  setBusy(false);
+  scrollFeed();
+});
+
+for (const button of scenarioButtons) {
+  button.addEventListener("click", () => {
+    if (button.dataset.scenario !== active) openScenario(button.dataset.scenario);
+  });
+}
+document.getElementById("reset").addEventListener("click", () => {
+  sample = newState();
+  limitClaude = true;
+  openScenario(active);
+});
+openScenario(active);
+</script>
 </body>
 </html>

@@ -4,17 +4,18 @@
 
 I built Haven to do everyday work on my Windows computer from Discord. When Claude hits a usage limit, Codex can pick up the request and drive the same browser. When an action needs my approval, Haven shows me exactly what it plans to do.
 
-**[Download the interactive demo](https://github.com/Bluezip231/Haven-Public/releases/latest/download/haven-demo.zip)** · [Release notes](https://github.com/Bluezip231/Haven-Public/releases/latest)
+**[Try the live demo](https://bluezip231.github.io/Haven-Public/haven-demo.html)** · [Download the offline demo](https://github.com/Bluezip231/Haven-Public/releases/latest/download/haven-demo.zip)
 
-Unzip the download and open `haven-demo.html` in your browser. The three scenarios run offline with fictional data. They simulate Haven’s workflow and require no account, API key, or installation.
+Press **Send request** and follow the tool calls in the activity trace. To run it offline, unzip the download and open `haven-demo.html`. The demo uses fictional data and simulated actions.
 
-![Haven Public demo showing the handoff from Claude to Codex](media/haven-demo.png)
+[![Try the Haven demo, shown with a completed Claude-to-Codex handoff and tool activity](media/haven-demo.png)](https://bluezip231.github.io/Haven-Public/haven-demo.html)
 
 ## Try it in a minute
 
-- **AI failover** replays a browser request that moves from Claude to Codex after a usage limit.
-- **Calendar approval** lets you approve or decline a simulated event and see the outcome.
-- **CRM matching** compares two fictional contacts with matching phone numbers and conflicting emails.
+- **Browser failover** lets you toggle Claude’s usage limit and watch who opens the same browser tab.
+- **Calendar approval** lets you name an event and see the sample calendar change only after you approve it.
+- **CRM matching** lets you resolve conflicting email addresses and rerun the comparison.
+- **Update rollback** lets you simulate a successful startup or a timeout and see which version stays online.
 
 ## What I built
 
